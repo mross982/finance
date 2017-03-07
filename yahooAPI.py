@@ -7,14 +7,6 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from pprint import pprint
 
-def find_files(abs_file_path):
-	if len(sys.argv) == 1:
-		for file in os.listdir(abs_file_path):
-			filename = file
-			read_symbols(filename)
-	else: 
-		filename = sys.argv[1]
-		read_symbols(filename)
 
 def read_symbols(s_symbols_file):
     '''Read a list of symbols'''
@@ -63,12 +55,12 @@ def writedata(updates):
 				dict_writer.writeheader()
 				dict_writer.writerows(thing)
 
-
-			# try:
-			# 	os.makedirs(path)
-			# except:
-			# 	if not os.path.isdir(path):
-			# 		raise
+def makedir(path):
+	try:
+		os.makedirs(path)
+	except:
+		if not os.path.isdir(path):
+			raise
 
 
 # gives the opening price of the previous trading day
@@ -84,7 +76,13 @@ if __name__ == '__main__':
 	rel_path = "Fund_data\\" 
 	abs_file_path = os.path.join(script_dir, rel_path)
 
-	ls_symbols = find_files(abs_file_path)
+	if len(sys.argv) == 1:
+		for file in os.listdir(abs_file_path):
+			filename = file
+			ls_symbols = read_symbols(filename)
+	else: 
+		filename = sys.argv[1]
+		ls_symbols = read_symbols(filename)
 
 	end_date = datetime.date.today()
 	start_date = end_date - relativedelta(years=1)
