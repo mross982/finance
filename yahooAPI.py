@@ -6,32 +6,28 @@ import os
 import datetime
 from dateutil.relativedelta import relativedelta
 from pprint import pprint
-import glob
 
 
 def read_symbols(s_symbols_file):
-    '''Read each line from a .txt file and return a list of symbols'''
-
-    s_symbols_file = os.path.abspath(s_symbols_file)
+    '''Read a list of symbols'''
+  
+    # s_symbols_file = os.path.abspath("Fund_data\\" + s_symbols_file)
     ls_symbols = []
     ffile = open(s_symbols_file, 'r')
     for line in ffile.readlines():
         str_line = str(line)
         if str_line.strip(): 
-        	ls_symbols.append(str_line.strip())
+            ls_symbols.append(str_line.strip())
     ffile.close()
-  
     return ls_symbols 
-
 
 def daily_update(ls_symbols, start_date, end_date):
 
 	updates = []
-	for symbol in ls_symbols:
-		print symbol
+	for sec in ls_symbols:
 		try:
-			security = Share(symbol)
-			print 'getting data from Yahoo...'
+			print 'Getting ' + sec + ' data from Yahoo...'
+			security = Share(sec)
 			tick = [
 			security.get_historical(str(start_date), str(end_date))
 			]
@@ -45,15 +41,16 @@ def daily_update(ls_symbols, start_date, end_date):
 
 def writedata(updates):
 
+	print 'Writing csv files'
 	for items in updates:
 		for thing in items:
 			# for security in thing:
 			keys = thing[0].keys()
 			ticker_symbol = thing[0]
-			# print ticker_symbol
+			print ticker_symbol
 			ticker_symbol = ticker_symbol['Symbol']
-			# print ticker_symbol
-			path = 'C:\Users\Michael\Anaconda3\envs\QSTK\Lib\site-packages\QSTK\QSData\Yahoo'
+			print ticker_symbol
+			path = 'C:\python2.7\QSTK\Lib\site-packages\QSTK\QSData\Yahoo'
 		
 			with open(path + '\\' + ticker_symbol + '.csv', 'wb') as csv_file:
 				dict_writer = csv.DictWriter(csv_file, fieldnames = keys, restval = 'NAN', extrasaction='ignore')
@@ -81,17 +78,14 @@ if __name__ == '__main__':
 	start_date = end_date - relativedelta(years=1)
 
 	script_dir = os.path.dirname(__file__)
-	rel_path = "accounts\\*" 
-	abs_file_path = os.path.join(script_dir, rel_path)
-	
-	# print os.path.realpath(__file__) finds this script's path
+	rel_path = "accounts\\"
 
 	if len(sys.argv) == 1:
-		for file in glob.glob(abs_file_path):
-			filename = file
+		for file in glob.glob(os.path.join(script_dir, rel_path, '*')):
+			print filename
 			ls_symbols = read_symbols(filename)
 			daily_update(ls_symbols, start_date, end_date)
 	else: 
 		filename = sys.argv[1]
-		ls_symbols = read_symbols(filename)
+		ls_symbols = read_symbols(os.path.join(script_dir, rel_path, filename))
 		daily_update(ls_symbols, start_date, end_date)
