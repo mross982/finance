@@ -1,8 +1,11 @@
+#! C:\Python27\python.exe
+
 from yahoo_finance import Share
 import csv
 from pprint import pprint
 import sys
 import os
+import re
 import datetime
 from dateutil.relativedelta import relativedelta
 from pprint import pprint
@@ -11,15 +14,18 @@ from pprint import pprint
 def read_symbols(s_symbols_file):
     '''Read a list of symbols'''
   
-    # s_symbols_file = os.path.abspath("Fund_data\\" + s_symbols_file)
+    acctBalance = 0  
     ls_symbols = []
     ffile = open(s_symbols_file, 'r')
     for line in ffile.readlines():
-        str_line = str(line)
-        if str_line.strip(): 
-            ls_symbols.append(str_line.strip())
+    	if re.search('\d', line):
+    		acctBalance = line
+    	else:
+	        str_line = str(line)
+	        if str_line.strip(): 
+	            ls_symbols.append(str_line.strip())
     ffile.close()
-    return ls_symbols 
+    return acctBalance, ls_symbols 
 
 def daily_update(ls_symbols, start_date, end_date):
 
@@ -33,8 +39,8 @@ def daily_update(ls_symbols, start_date, end_date):
 			]
 			updates.append(tick)
 		except:
-			print 'No data for ' + tick
-			pass
+		    print 'No data for ' + sec
+		    pass
 
 	writedata(updates)
 
@@ -42,6 +48,8 @@ def daily_update(ls_symbols, start_date, end_date):
 def writedata(updates):
 
 	print 'csv files created'
+
+	fieldorder = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Adj Close']
 	for items in updates:
 		for thing in items:
 			keys = thing[0].keys()
@@ -50,7 +58,7 @@ def writedata(updates):
 			path = 'C:\Python27\Lib\site-packages\QSTK\QSData\Yahoo'
 		
 			with open(path + '\\' + ticker_symbol + '.csv', 'wb') as csv_file:
-				dict_writer = csv.DictWriter(csv_file, fieldnames = keys, restval = 'nan', extrasaction='ignore')
+				dict_writer = csv.DictWriter(csv_file, fieldnames = fieldorder, restval = 'nan', extrasaction='ignore')
 				dict_writer.writeheader()
 				dict_writer.writerows(thing)
 
@@ -80,9 +88,10 @@ if __name__ == '__main__':
 	if len(sys.argv) == 1:
 		for file in glob.glob(os.path.join(script_dir, rel_path, '*')):
 			print filename
-			ls_symbols = read_symbols(filename)
+			account_Balance, ls_symbols = read_symbols(filename)
 			daily_update(ls_symbols, start_date, end_date)
 	else: 
 		filename = sys.argv[1]
-		ls_symbols = read_symbols(os.path.join(script_dir, rel_path, filename))
+		account_Balance, ls_symbols = read_symbols(os.path.join(script_dir, rel_path, filename))
+		print 'Account Balance is', account_Balance
 		daily_update(ls_symbols, start_date, end_date)

@@ -51,10 +51,12 @@ def writedata(updates):
 			print keys
 			sys.exit(0)
 			ticker_symbol = thing[0]['Symbol']
+			# Make this path relative
 			path = 'C:\Python27\Lib\site-packages\QSTK\QSData\Yahoo'
 		
 			with open(path + '\\' + ticker_symbol + '.csv', 'wb') as csv_file:
 				dict_writer = csv.DictWriter(csv_file, fieldnames = keys, restval = 'nan', extrasaction='ignore')
+				# If I know the field names b/c they are keys, I should be able to order them
 				dict_writer.writeheader()
 				dict_writer.writerows(thing)
 

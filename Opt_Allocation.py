@@ -78,9 +78,10 @@ def optimal_allocation_4( dt_start, dt_end, ls_symbols ):
 
 
 # Example 1
-dt_start = dt.datetime(2016,3,11)
-dt_end = dt.datetime(2017,3,11)
-ls_symbols = ['JDMNX', 'DODGX', 'DIMVX', 'BAGIX']
+dt_start = dt.datetime(2010,3,11)
+dt_end = dt.datetime(2011,3,11)
+# ls_symbols = ['JDMNX', 'DODGX', 'DIMVX', 'BAGIX']
+ls_symbols = ["AAPL", "ABC", "ABI", "ABKFQ"]
 ls_allocation = [0.4, 0.4, 0.0, 0.2]
 
 max_alloc = optimal_allocation_4( dt_start, dt_end, ls_symbols )
